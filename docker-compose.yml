@@ -1,0 +1,41 @@
+services:
+
+  php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    image: chriscusacknbcc/php-dev:8.3
+    container_name: shared-php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./apps:/var/www/apps
+      - ./php/apache.conf:/etc/apache2/sites-enabled/000-default.conf
+
+  mysql:
+    image: mysql:8.0
+    container_name: shared-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3307"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: shared-phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PMA_ARBITRARY: 1
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
